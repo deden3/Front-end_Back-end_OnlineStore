@@ -43,7 +43,7 @@ router.route('/fruits')
     // create a new fruit accessed at POST http://localhost:8080/api/shopping
     .post(function(req,res){
         if(req.body.price==null)
-            res.send(err);
+            res.send(err);//price is required, tax optional
             
         var fruit = new Fruit();//create new instance of Fruit from script model
         fruit.name = req.body.name;
@@ -151,6 +151,7 @@ router.route('/bears/:bear_id')
         Bear.findById(req.params.bear_id, function(err, bear) {
             if (err)
                 res.send(err);
+                
             res.json(bear);
         });
     })
