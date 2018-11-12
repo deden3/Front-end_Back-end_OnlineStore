@@ -6,6 +6,7 @@
 var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/bears'); // connect to our database
 var Bear     = require('./app/models/bear');
+var Fruit    = require('./app/models/fruit');
 // call the packages we need
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
@@ -35,7 +36,83 @@ router.get('/', function(req, res) {
 });
 
 // more routes for our API will happen here
+// on routes that end in /shopping
+//---------------------------------
+router.route('/fruits')
 
+    // create a new fruit accessed at POST http://localhost:8080/api/shopping
+    .post(function(req,res){
+        if(req.body.price==null)
+            res.send(err);
+            
+        var fruit = new Fruit();//create new instance of Fruit from script model
+        fruit.name = req.body.name;
+        fruit.price = req.body.price;
+        fruit.tax = req.body.tax;
+        fruit.quantity = req.body.quantity;
+        fruit.save(function(err) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'Fruit created!' });
+        });
+        
+    })
+     .get(function(req, res) {
+     Fruit.find(function(err, fruits) {
+            if (err)
+                res.send(err);
+
+            res.json(fruits);
+        });
+    });
+// on routes that end in /fruits/:fruit_id
+// -------------
+router.route('/fruits/:fruit_id')
+
+    // get the fruit with that id (accessed at GET http://localhost:8080/api/bears/:bear_id)
+    .get(function(req, res) {
+        Fruit.findById(req.params.fruit_id, function(err, fruit) {
+            if (err)
+                res.send(err);
+            res.json(fruit);
+        });
+    })
+    // update the bear with this id (accessed at PUT http://localhost:8080/quantityapi/bears/:bear_id)
+    .put(function(req, res) {
+
+        // use our bear model to find the bear we want
+        Fruit.findById(req.params.fruit_id, function(err, fruit) {
+
+            if (err)
+                res.send(err);
+            if(req.body.tax!=fruit.tax&&req.body.tax!=null)
+                fruit.tax = req.body.tax;  // update the fruits info
+            if(req.body.quantity!=fruit.quantity&&req.body.quantity!=null)
+                fruit.quantity = req.body.quantity;  // update the fruits info
+                
+            
+            // save the bear
+            fruit.save(function(err) {
+                if (err)
+                    res.send(err);
+
+                res.json({ message: 'Fruit  updated!' });
+            });
+
+        });
+    })
+     // delete the bear with this id (accessed at DELETE http://localhost:8080/api/bears/:bear_id)
+    .delete(function(req, res) {
+        Fruit.remove({
+            _id: req.params.fruit_id
+        }, function(err, fruit) {
+            if (err)
+                res.send(err);
+
+            res.json({ message: 'Successfully deleted' });
+        });
+    });
 
 // on routes that end in /bears
 // ----------------------------------------------------
